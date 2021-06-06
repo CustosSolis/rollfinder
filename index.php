@@ -20,15 +20,20 @@ $('#gun option:eq(0)').prop('selected',true);
 <body>
 <h1><u>DrGodroll's Godroll Finder</u></h1>
 <?php
-$json = file_get_contents("https://raw.githubusercontent.com/dcaslin/d2-checklist/f02374a0ce6b50576cc7936b326b419d8bb76889/src/assets/panda-godrolls.min.json");
-$data = json_decode($json,true);
+// Rolls Json
+$rolljson = file_get_contents("https://raw.githubusercontent.com/dcaslin/d2-checklist/f02374a0ce6b50576cc7936b326b419d8bb76889/src/assets/panda-godrolls.min.json");
+$rolls = json_decode($rolljson,true);
+
+// Guns Json
+$weaponsjson = file_get_contents("./guns.json");
+$weapons = json_decode($weaponsjson,true);
 ?>
 <form action="" method="post">
 <select class="js-example-basic-single" name="gun" id="gun">
 <?php
-foreach ($data as $item) {
+foreach ($weapons as $key => $value) {
 ?>
-<option value="<?php echo ucwords($item["name"])?>" id="<?php echo $item["name"]?>"><?php echo ucwords($item["name"])?></option>
+<option value="<?php echo ucwords($value)?>" id="<?php echo $value?>"><?php echo ucwords($value)?></option>
 
 <?php
 }
@@ -43,7 +48,7 @@ if(isset($_POST["gun"])){
 
 $gun = strtolower($_POST["gun"]);
 
-foreach ($data as $item) {
+foreach ($rolls as $item) {
     if ($item["name"] == $gun) {
 		if ($item["mnk"] == "true" && $item["controller"] == "true" ) {$controls = "Console & PC";} else {
 					if ($item["mnk"] == "true"){$controls = "PC";}
