@@ -4,4 +4,4 @@ Credits:
 - dcaslin (/u/dweezil22 @ reddit)
 - pandapaxxy
 
-Proof of concept tots of stuff to improve, i'm still learning.
+Proof of concept lots of stuff to improve, i'm still learning.
