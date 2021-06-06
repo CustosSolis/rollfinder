@@ -11,7 +11,7 @@ $(document).ready(function() {
 
 </head>
 <body>
-<h1><u>DrGodroll's Godroll Finder</u></h1>
+<h1><u>Godroll Finder</u></h1>
 <?php
 $json = file_get_contents("https://raw.githubusercontent.com/dcaslin/d2-checklist/f02374a0ce6b50576cc7936b326b419d8bb76889/src/assets/panda-godrolls.min.json");
 $data = json_decode($json,true);
@@ -43,14 +43,14 @@ echo "<h2>" . ucwords($item["sheet"]) . "</h2>";
 
 echo "<h3>PvP:</h3>";
 
-echo "<b>Beste Perks voor PvP:</b><br>";
+echo "<b>Great Perks:</b><br>";
 foreach($item["pvp"]["greatPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
 }
 echo "<br>";
 
-echo "<b>Andere goede opties voor PvP</b><br>";
+echo "<b>Good Perks:</b><br>";
 foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
@@ -66,14 +66,14 @@ echo "<br>";
 
 echo "<h3>PvE:</h3>";
 
-echo "<b>Beste Perks voor PvE:</b><br>";
+echo "<b>Great Perks:</b><br>";
 foreach($item["pve"]["greatPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
 }
 echo "<br>";
 
-echo "<b>Andere goede opties voor PvE:</b><br>";
+echo "<b>Good Perks:</b><br>";
 foreach($item["pve"]["goodPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
@@ -91,7 +91,7 @@ echo "<br>";
     }
 }
 
-} else { echo "Kies een gun uit de lijst";}
+} else { echo "Pick a gun..";}
 ?>
 
 </body></html>
