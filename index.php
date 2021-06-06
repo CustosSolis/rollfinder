@@ -38,8 +38,11 @@ $gun = strtolower($_POST["gun"]);
 
 foreach ($data as $item) {
     if ($item["name"] == $gun) {
-echo "<u><h1>" . ucwords($item["name"]) . "</h1></u>";
-echo "<h2>" . ucwords($item["sheet"]) . "</h2>";
+		if ($item["mnk"] == "true" && $item["controller"] == "true" ) {$controls = "Console & PC";} else {
+					if ($item["mnk"] == "true"){$controls = "PC";}
+					if ($item["controller"] == "true"){$controls = "Console";}
+		}
+echo "<h1><u>" . ucwords($item["name"]) . "</u> (" . $controls . ")</h1>";
 
 echo "<h3>PvP:</h3>";
 
