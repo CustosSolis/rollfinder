@@ -5,13 +5,20 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('.js-example-basic-single').select2();
+	$('.js-example-basic-single').select2();
+	var options = $("#gun option");       
+options.detach().sort(function(a,b) {
+    var at = $(a).text();
+    var bt = $(b).text();         
+    return (at > bt)?1:((at < bt)?-1:0);
 });
+options.appendTo("#gun");
+$('#gun option:eq(0)').prop('selected',true);
+	});
 </script>
-
 </head>
 <body>
-<h1><u>Godroll Finder</u></h1>
+<h1><u>DrGodroll's Godroll Finder</u></h1>
 <?php
 $json = file_get_contents("https://raw.githubusercontent.com/dcaslin/d2-checklist/f02374a0ce6b50576cc7936b326b419d8bb76889/src/assets/panda-godrolls.min.json");
 $data = json_decode($json,true);
@@ -43,17 +50,19 @@ foreach ($data as $item) {
 					if ($item["controller"] == "true"){$controls = "Console";}
 		}
 echo "<h1><u>" . ucwords($item["name"]) . "</u> (" . $controls . ")</h1>";
+echo "<b>Comments:</b> " . ucwords($item["sheet"]);
 
-echo "<h3>PvP:</h3>";
+// PVP ROLL
+echo "<h3><u>PvP:</u></h3>";
 
-echo "<b>Great Perks:</b><br>";
+echo "<b>Best perks:</b><br>";
 foreach($item["pvp"]["greatPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
 }
 echo "<br>";
 
-echo "<b>Good Perks:</b><br>";
+echo "<b>Good perks:</b><br>";
 foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
@@ -67,16 +76,17 @@ $num = $key + 1;
 }
 echo "<br>";
 
-echo "<h3>PvE:</h3>";
+// PVE ROLL
+echo "<h3><u>PvE:</u></h3>";
 
-echo "<b>Great Perks:</b><br>";
+echo "<b>Best perks:</b><br>";
 foreach($item["pve"]["greatPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
 }
 echo "<br>";
 
-echo "<b>Good Perks:</b><br>";
+echo "<b>Good perks:</b><br>";
 foreach($item["pve"]["goodPerks"] as $key => $value) {
 $num = $key + 1;
   echo $num . ". " . ucwords($value) . "<br>";
@@ -94,7 +104,7 @@ echo "<br>";
     }
 }
 
-} else { echo "Pick a gun..";}
+} else { echo "Pick a gun from the list...";}
 ?>
 
 </body></html>
