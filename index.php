@@ -40,19 +40,15 @@ table td, table td * {
 $rolljson = file_get_contents("https://raw.githubusercontent.com/dcaslin/d2-checklist/f02374a0ce6b50576cc7936b326b419d8bb76889/src/assets/panda-godrolls.min.json");
 $rolls = json_decode($rolljson,true);
 
-// Guns Json
-$weaponsjson = file_get_contents("./guns.json");
-$weapons = json_decode($weaponsjson,true);
-
 ?>
 
 <!-- Dropdown menu -->
 <form action="" method="post">
-<select class="selectpicker" data-live-search="true" name="gun" id="gun">
+<select class="js-example-basic-single" name="gun" id="gun">
 <?php
-foreach ($weapons as $key => $value) {
+foreach ($rolls as $item) {
 ?>
-<option data-tokens="<?php echo strtolower($value)?>" value="<?php echo strtolower($value)?>" id="<?php echo strtolower($value)?>"><?php echo ucwords($value)?></option>
+<option data-tokens="<?php echo strtolower($item["name"])?>" value="<?php echo strtolower($item["name"])?>" id="<?php echo strtolower($item["name"])?>"><?php echo ucwords($item["name"])?></option>
 
 <?php
 }
@@ -180,4 +176,19 @@ $num = $key + 1;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+	$('.js-example-basic-single').select2();
+	var options = $("#gun option");       
+options.detach().sort(function(a,b) {
+    var at = $(a).text();
+    var bt = $(b).text();         
+    return (at > bt)?1:((at < bt)?-1:0);
+});
+options.appendTo("#gun");
+$('#gun option:eq(0)').prop('selected',true);
+	});
+</script>
 </body></html>
