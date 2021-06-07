@@ -15,6 +15,20 @@ table td, table td * {
 	font-size: medium;
 }
 
+.table {
+    max-width: fit-content;
+    margin-bottom: 1rem;
+    background-color: transparent;
+}
+
+.container-fluid {
+    width: fit-content;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
 </style>
 </head>
 <body>
@@ -34,7 +48,6 @@ $weapons = json_decode($weaponsjson,true);
 
 <!-- Dropdown menu -->
 <form action="" method="post">
-<div class="row-fluid">
 <select class="selectpicker" data-live-search="true" name="gun" id="gun">
 <?php
 foreach ($weapons as $key => $value) {
@@ -47,7 +60,6 @@ foreach ($weapons as $key => $value) {
 
 </select>
 <input type="submit" value="Pick">
-</div>
 </form>
 
 <?php
@@ -65,6 +77,7 @@ foreach ($rolls as $item) {
 		}
 
 // Name of weapon
+echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<h3><u>" . ucwords($item["name"]) . "</u> (" . $controls . ")</h3>";
 
 // Sheet
@@ -73,7 +86,6 @@ echo "<p><small><b>Sheet: </b><a href=\"https://docs.google.com/spreadsheets/d/1
 // PVP ROLL
 echo "<h4><u>PvP:</u></h4>";
 ?>
-<div id="perks">
 <table class="table">
   <thead class="thead-dark">
     <tr>
@@ -111,14 +123,12 @@ $num = $key + 1;
     </tr>
   </tbody>
 </table>
-</div>
 
 <?php
 
 // PVE ROLL
 echo "<h5><u>PvE:</u></h5>";
 ?>
-<div id="perks">
 <table class="table">
   <thead class="thead-dark">
     <tr>
@@ -156,7 +166,6 @@ $num = $key + 1;
     </tr>
   </tbody>
 </table>
-</div>
 <?php
 
     }
