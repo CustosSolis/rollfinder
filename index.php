@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>D2Rollfinder</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -33,7 +34,7 @@ table td, table td * {
 </head>
 <body>
 <div class="container-fluid">
-<h1><u>DrGodroll's Godroll Finder</u></h1>
+<h1><u>D2Rollfinder</u></h1>
 <?php
 
 // Rolls Json
@@ -73,13 +74,13 @@ if(isset($item["name"])){
 
 <?php
 
-// Check if selected option is console or PC in source Json for right tagging.
 if(isset($_POST["gun"])){
 
 $gun = strtolower($_POST["gun"]);
 
 foreach ($rolls as $item) {
     if ($item["name"] == $gun) {
+		// Check if selected option is console or PC in source Json for right tagging.
 		if ($item["mnk"] == "true" && $item["controller"] == "true" ) {$controls = "Console & PC";} else {
 					if ($item["mnk"] == "true"){$controls = "PC";}
 					if ($item["controller"] == "true"){$controls = "Console";}
@@ -180,9 +181,11 @@ $num = $key + 1;
     }
 }
 
-} else { echo "Pick a gun from the list...";}
+} else { 
+echo "<p>Pick a gun from the list...</p>";
+echo "<small>By <a href=\"https://www.reddit.com/user/darkelement1987\">/u/darkelement1987</a></small>";
+}
 
-// End check if selected option is console or PC in source Json for right tagging.
 ?>
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
