@@ -184,6 +184,7 @@ $num = $key + 1;
 } else { 
 echo "<p>Pick a gun from the list...</p>";
 echo "<small>By <a href=\"https://www.reddit.com/user/darkelement1987\">/u/darkelement1987</a></small>";
+echo " / <img src=\"https://icons.iconarchive.com/icons/martz90/circle-addon2/16/playstation-icon.png\"><small><b> DrGodroll</b></small>";
 }
 
 ?>
