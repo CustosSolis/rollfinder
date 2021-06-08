@@ -40,6 +40,18 @@ table td, table td * {
 $rolljson = file_get_contents("https://raw.githubusercontent.com/dcaslin/d2-checklist/f02374a0ce6b50576cc7936b326b419d8bb76889/src/assets/panda-godrolls.min.json");
 $rolls = json_decode($rolljson,true);
 
+// Handle Duplicates
+$new_array = array();
+$exists    = array();
+foreach($rolls as $element ) {
+    if( !in_array( $element['name'], $exists )) {
+        $new_array[] = $element;
+        $exists[]    = $element['name'];
+    }
+}
+$rolls = $new_array;
+// End Of Handle Duplicates
+
 ?>
 
 <!-- Dropdown menu -->
@@ -47,11 +59,12 @@ $rolls = json_decode($rolljson,true);
 <select class="js-example-basic-single" name="gun" id="gun">
 <?php
 foreach ($rolls as $item) {
+if(isset($item["name"])){
 ?>
 <option data-tokens="<?php echo strtolower($item["name"])?>" value="<?php echo strtolower($item["name"])?>" id="<?php echo strtolower($item["name"])?>"><?php echo ucwords($item["name"])?></option>
 
 <?php
-}
+} else {}}
 ?>
 
 </select>
