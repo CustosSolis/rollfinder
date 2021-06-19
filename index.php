@@ -30,6 +30,7 @@ $getColDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldCompo
 $getPlugDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyPlugSetDefinition"]);
 $getDmgDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyDamageTypeDefinition"]);
 
+// Creation of files and update procedure
 if(!file_exists('version.txt')){
 	file_put_contents('version.txt',$remoteversion);
 }
@@ -79,12 +80,10 @@ $rolls = json_decode($rolljson,true);
 <option></option>
 <?php
 foreach ($rolls as $item) {
-	// Get rid of D.F.A since it breaks the website, try to fix later
-	if($item["name"] == "d.f.a."){} else {
 ?>
 <option data-tokens="<?php echo strtolower($item["name"])?>" value="<?php echo ucwords($item["name"])?>|<?php echo ucwords($item["sheet"])?>"><?php echo ucwords($item["name"]). " ("  . ucwords($item["sheet"]) . ")"?></option>
 <?php
-}}
+}
 ?>
 </select>
 </p>
@@ -156,6 +155,18 @@ switch ($getelem) {
 	break;
 }
 
+$mwpvp = "";
+$mwpve = "";
+
+// Specify MW
+foreach($item["pvp"]["masterwork"] as $key => $value) {
+$mwpvp = "<p><h5>Masterwork: <small><b>" . ucwords($value) . "</b></small></h5></p>";
+}
+
+foreach($item["pve"]["masterwork"] as $key => $value) {
+$mwpve = "<p><h5>Masterwork: <small><b>" . ucwords($value) . "</b></small></h5></p>";
+}
+
 // Echo the weapons info
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<h4><u>" . ucwords($item["name"]) . "</u></h4>";
@@ -172,6 +183,7 @@ echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
 
 // PVP ROLL
 echo "<p><h4><u>PvP:</u></h4></p>";
+echo $mwpvp;
 
 ?>
 <table class="table">
@@ -206,17 +218,6 @@ echo getPerks($getfirst,$great,$good,$plugDef,$invItemDef);
       <td>
 	  <?php 
 
-$great = array();
-$good = array();
-
-foreach($item["pvp"]["greatPerks"] as $key => $value) {
-$great[] = $value;
-}
-
-foreach($item["pvp"]["goodPerks"] as $key => $value) {
-$good[] = $value;
-}
-
 $getsecond = $invItemDef[$itemdef]["sockets"]["socketEntries"][2];
 echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
 	  ?>
@@ -224,34 +225,12 @@ echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
       <td>
 	  <?php 
 
-$great = array();
-$good = array();
-
-foreach($item["pvp"]["greatPerks"] as $key => $value) {
-$great[] = $value;
-}
-
-foreach($item["pvp"]["goodPerks"] as $key => $value) {
-$good[] = $value;
-}
-
 $getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][3];
 echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
-
-$great = array();
-$good = array();
-
-foreach($item["pvp"]["greatPerks"] as $key => $value) {
-$great[] = $value;
-}
-
-foreach($item["pvp"]["goodPerks"] as $key => $value) {
-$good[] = $value;
-}
 
 $getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][4];
 echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
@@ -266,6 +245,7 @@ echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 // PVE ROLL
 echo "<p><small>* = Best perks</small></p>";
 echo "<h5><u>PvE:</u></h5>";
+echo $mwpve;
 
 ?>
 <table class="table">
@@ -282,9 +262,6 @@ echo "<h5><u>PvE:</u></h5>";
       <td>
 	  <?php 
 
-$great = array();
-$good = array();
-
 foreach($item["pve"]["greatPerks"] as $key => $value) {
 $great[] = $value;
 }
@@ -300,17 +277,6 @@ echo getPerks($getfirst,$great,$good,$plugDef,$invItemDef);
       <td>
 	  <?php 
 
-$great = array();
-$good = array();
-
-foreach($item["pve"]["greatPerks"] as $key => $value) {
-$great[] = $value;
-}
-
-foreach($item["pve"]["goodPerks"] as $key => $value) {
-$good[] = $value;
-}
-
 $getsecond = $invItemDef[$itemdef]["sockets"]["socketEntries"][2];
 echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
 	  ?>
@@ -318,34 +284,12 @@ echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
       <td>
 	  <?php 
 
-$great = array();
-$good = array();
-
-foreach($item["pve"]["greatPerks"] as $key => $value) {
-$great[] = $value;
-}
-
-foreach($item["pve"]["goodPerks"] as $key => $value) {
-$good[] = $value;
-}
-
 $getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][3];
 echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
-
-$great = array();
-$good = array();
-
-foreach($item["pve"]["greatPerks"] as $key => $value) {
-$great[] = $value;
-}
-
-foreach($item["pve"]["goodPerks"] as $key => $value) {
-$good[] = $value;
-}
 
 $getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][4];
 echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
