@@ -1,8 +1,10 @@
 <?php
 require_once("functions.php");
 require("config/config.php");
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('memory_limit', '-1');
+set_time_limit(0);
 error_reporting(E_ALL);
 ?>
 <html>
@@ -119,9 +121,12 @@ foreach ($rolls as $item) {
 $name = ucwords($item["name"]);
 
 foreach($invItemDef as $key => $value){
-	if(strcasecmp($value["displayProperties"]["name"], $name) == 0 && isset($value["collectibleHash"])){
+	// Note: When errors on, bug occured on Heretic, no defaultDamageTypeHash in invitemdef
+	// edit: solved with isset($value["defaultDamageTypeHash"]), there were 2 Heretic entries in invitemdef.json apparently
+	// 1 with defaultDamageTypeHash and 1 without
+	if(strcasecmp($value["displayProperties"]["name"], $name) == 0 && isset($value["collectibleHash"]) && isset($value["defaultDamageTypeHash"])){
 $colhash = $invItemDef[$key]["collectibleHash"];
-$icon = $bungie . $invItemDef[$key]["displayProperties"]["icon"];
+$icon = $bungie . $colDef[$colhash]["displayProperties"]["icon"];
 $rarity = $invItemDef[$key]["inventory"]["tierTypeName"];
 $flavor = $invItemDef[$key]["flavorText"];
 $itemdef = $key;
@@ -182,7 +187,7 @@ echo "<small>Sheet/season: <a href=\"" . $spreadsheet . sheetUrl(ucwords($sheet)
 echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
 
 // PVP ROLL
-echo "<p><h4><u>PvP:</u></h4></p>";
+echo "<p><h4><u>Good Perks PvP:</u></h4></p>";
 echo $mwpvp;
 
 ?>
@@ -244,7 +249,7 @@ echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 
 // PVE ROLL
 echo "<p><small>* = Best perks</small></p>";
-echo "<h5><u>PvE:</u></h5>";
+echo "<h4><u>Good Perks PvE:</u></h4>";
 echo $mwpve;
 
 ?>

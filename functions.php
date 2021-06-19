@@ -123,10 +123,14 @@ function getPerks($args,$great,$good,$plugDef,$invItemDef){
 		$getdef = $plugDef[$gethash];
 		$get = $getdef["reusablePlugItems"];
 		$perks = array();
+		$icons = array();
+		
 		foreach($get as $key => $value){
+			//if($value["currentlyCanRoll"] == true){
 			$perks[] = $invItemDef[$value["plugItemHash"]]["displayProperties"]["name"];
+			//}
 			$perkflip = array_keys(array_flip($perks));
-				}
+		}
 				foreach($perkflip as $value){
 					if (in_array(strtolower($value), array_map('strtolower', $great))) {
 						echo "<b><u>" . $value . "</u>*</b><br>";
@@ -137,6 +141,16 @@ function getPerks($args,$great,$good,$plugDef,$invItemDef){
 					}
 								}
 					}
+}
+
+function getPerkIcon($name){
+	$invItemDef = json_decode(file_get_contents("invitemdef.json"),true);
+	foreach($invItemDef as $key => $value){
+	if($value["displayProperties"]["name"] == $name){
+		$hash = $key;
+	}
+		}
+		return "https://www.bungie.net" . $invItemDef[$hash]["displayProperties"]["icon"];
 }
 
 ?>
