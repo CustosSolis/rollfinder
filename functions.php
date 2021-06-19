@@ -112,7 +112,7 @@ return json_decode(curl_exec($ch),true);
 curl_close;
 }
 
-function getPerks($args,$great,$good){
+function getPerks($args,$great,$good,$plugDef,$invItemDef){
 	if (!array_key_exists('randomizedPlugSetHash', $args) && !array_key_exists('reusablePlugSetHash', $args)) {} else {
 	
 	if(isset($args["randomizedPlugSetHash"])){
@@ -120,18 +120,23 @@ function getPerks($args,$great,$good){
 	} else {
 		$gethash = $args["reusablePlugSetHash"];
 	}
-		$getdef =& apiRequest('/Destiny2/Manifest/DestinyPlugSetDefinition/' . $gethash . '/');
-		$get = $getdef["Response"]["reusablePlugItems"];
-		$getname =& apiRequest('/Destiny2/Manifest/DestinyInventoryItemDefinition/' . $gethash . '/');
+		$getdef = $plugDef[$gethash];
+		$get = $getdef["reusablePlugItems"];
+		$perks = array();
 		foreach($get as $key => $value){
-			$getname =& apiRequest('/Destiny2/Manifest/DestinyInventoryItemDefinition/' . $value["plugItemHash"] . '/');
-	if (in_array(strtolower($getname["Response"]["displayProperties"]["name"]), array_map('strtolower', $great)) || in_array(strtolower($getname["Response"]["displayProperties"]["name"]), array_map('strtolower', $good))) {
-		echo "<span class=\"font-weight-bold\">" . $getname["Response"]["displayProperties"]["name"] . "</span><br>";
-	} else {
-		echo "<span>" . $getname["Response"]["displayProperties"]["name"] . "</span><br>";
-	}
+			$perks[] = $invItemDef[$value["plugItemHash"]]["displayProperties"]["name"];
+			$perkflip = array_keys(array_flip($perks));
 				}
-	}
+				foreach($perkflip as $value){
+					if (in_array(strtolower($value), array_map('strtolower', $great))) {
+						echo "<b><u>" . $value . "</u>*</b><br>";
+					} elseif(in_array(strtolower($value), array_map('strtolower', $good))) {
+						echo "<b>" . $value . "</b><br>";
+					} else {
+						echo $value . "<br>";
+					}
+								}
+					}
 }
 
 ?>

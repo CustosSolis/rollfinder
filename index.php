@@ -1,6 +1,9 @@
 <?php
 require_once("functions.php");
 require("config/config.php");
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 ?>
 <html>
 <head>
@@ -16,6 +19,52 @@ require("config/config.php");
 <div class="container-fluid">
 <center><h1><b><?=$title?></b></h1></center>
 <?php
+
+// Check manifest and update stuff if needed
+$d2manifest = apiRequest('/Destiny2/Manifest/');
+$remoteversion = $d2manifest["Response"]["version"];
+
+$bungie = "https://www.bungie.net";
+$getInvItemDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyInventoryItemDefinition"]);
+$getColDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyCollectibleDefinition"]);
+$getPlugDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyPlugSetDefinition"]);
+$getDmgDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyDamageTypeDefinition"]);
+
+if(!file_exists('version.txt')){
+	file_put_contents('version.txt',$remoteversion);
+}
+
+$localversion = file_get_contents('version.txt');
+
+if($localversion !== $remoteversion){
+	file_put_contents('version.txt',$remoteversion);
+	file_put_contents("invitemdef.json",$getInvItemDef);
+	file_put_contents("coldef.json",$getColDef);
+	file_put_contents("plugdef.json",$getPlugDef);
+	file_put_contents("dmgdef.json",$getDmgDef);
+	}
+
+if(!file_exists('invitemdef.json')){
+		file_put_contents("invitemdef.json",$getInvItemDef);
+}
+
+if(!file_exists('coldef.json')){
+		file_put_contents("coldef.json",$getColDef);
+}
+
+if(!file_exists('plugdef.json')){
+		file_put_contents("plugdef.json",$getPlugDef);
+}
+
+if(!file_exists('dmgdef.json')){
+		file_put_contents("dmgdef.json",$getDmgDef);
+}
+
+$invItemDef = json_decode(file_get_contents("invitemdef.json"),true);
+$colDef = json_decode(file_get_contents("coldef.json"),true);
+$plugDef = json_decode(file_get_contents("plugdef.json"),true);
+$dmgDef = json_decode(file_get_contents("dmgdef.json"),true);
+
 
 // Rolls Json
 $rolljson = file_get_contents($rollsurl);
@@ -68,25 +117,20 @@ foreach ($rolls as $item) {
 		}
 		
 // Convert weaponname to itemhash, replace % with empty placeholder, otherwise search breaks, this is the case for 21% delirium
-$name = str_replace("%","",ucwords($item["name"]));
-$gethash =& apiRequest('/Destiny2/Armory/Search/DestinyInventoryItemDefinition/' . $name . '/');
-$results = $gethash["Response"]["results"]["results"];
+$name = ucwords($item["name"]);
 
-// Since some weapons have multiple versions, the name must be an exact match, for example drang / drang baroque
-foreach($results as $key => $value){
-	if(strcasecmp($value["displayProperties"]["name"],ucwords($item["name"])) == 0){
-		$icon = "https://www.bungie.net" . $value["displayProperties"]["icon"];
-		$manifest =& apiRequest('/Destiny2/Manifest/DestinyInventoryItemDefinition/' . $value["hash"] . '/');
+foreach($invItemDef as $key => $value){
+	if(strcasecmp($value["displayProperties"]["name"], $name) == 0 && isset($value["collectibleHash"])){
+$colhash = $invItemDef[$key]["collectibleHash"];
+$icon = $bungie . $invItemDef[$key]["displayProperties"]["icon"];
+$rarity = $invItemDef[$key]["inventory"]["tierTypeName"];
+$flavor = $invItemDef[$key]["flavorText"];
+$itemdef = $key;
+$weptype = $invItemDef[$key]["itemTypeDisplayName"];
+$getelem = $invItemDef[$key]["defaultDamageType"];
+$getelemhash = $invItemDef[$key]["defaultDamageTypeHash"];
 	}
 }
-
-$rarity = $manifest["Response"]["inventory"]["tierTypeName"];
-$flavor = $manifest["Response"]["flavorText"];
-$itemdef =& apiRequest('/Destiny2/Manifest/DestinyInventoryItemDefinition/' . $value["hash"] . '/');
-$weptype = $itemdef["Response"]["itemTypeDisplayName"];
-$colhash = $itemdef["Response"]["collectibleHash"];
-$coldef =& apiRequest('/Destiny2/Manifest/DestinyCollectibleDefinition/' . $colhash . '/');
-$getelem = $itemdef["Response"]["defaultDamageType"];
 
 // Specify element/damage names for weapons
 $element = "";
@@ -119,15 +163,16 @@ echo "<p><img src=\"" . $icon . "\"></p><i><footer class=\"blockquote-footer\">$
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<h4><u>Info</u></h4>";
 echo "<small>Type: </small>";
-echo "<span class=\"badge badge-primary\">$element $weptype</span>";
+echo "<span class=\"badge badge-primary\"><img src=" . $bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"] . " height=18> $element $weptype</span>";
 echo "<br>";
 echo "<small>Rarity: $rarity</small><br>";
 echo "<small>System: $controls</small><br>";
 echo "<small>Sheet/season: <a href=\"" . $spreadsheet . sheetUrl(ucwords($sheet)) . "\">" . ucwords($sheet) . "</a></small><br>";
-echo "<small>" . $coldef["Response"]["sourceString"] . "</small><br>";
+echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
 
 // PVP ROLL
 echo "<p><h4><u>PvP:</u></h4></p>";
+
 ?>
 <table class="table">
   <thead class="thead-dark">
@@ -154,8 +199,8 @@ foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getfirst = $itemdef["Response"]["sockets"]["socketEntries"][1];
-echo getPerks($getfirst,$great,$good);
+$getfirst = $invItemDef[$itemdef]["sockets"]["socketEntries"][1];
+echo getPerks($getfirst,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
@@ -172,8 +217,8 @@ foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getsecond = $itemdef["Response"]["sockets"]["socketEntries"][2];
-echo getPerks($getsecond,$great,$good);
+$getsecond = $invItemDef[$itemdef]["sockets"]["socketEntries"][2];
+echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
@@ -190,8 +235,8 @@ foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getthird = $itemdef["Response"]["sockets"]["socketEntries"][3];
-echo getPerks($getthird,$great,$good);
+$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][3];
+echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
@@ -208,8 +253,8 @@ foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getthird = $itemdef["Response"]["sockets"]["socketEntries"][4];
-echo getPerks($getthird,$great,$good);
+$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][4];
+echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
     </tr>
@@ -219,7 +264,9 @@ echo getPerks($getthird,$great,$good);
 <?php
 
 // PVE ROLL
+echo "<p><small>* = Best perks</small></p>";
 echo "<h5><u>PvE:</u></h5>";
+
 ?>
 <table class="table">
   <thead class="thead-dark">
@@ -246,8 +293,8 @@ foreach($item["pve"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getfirst = $itemdef["Response"]["sockets"]["socketEntries"][1];
-echo getPerks($getfirst,$great,$good);
+$getfirst = $invItemDef[$itemdef]["sockets"]["socketEntries"][1];
+echo getPerks($getfirst,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
@@ -264,8 +311,8 @@ foreach($item["pve"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getsecond = $itemdef["Response"]["sockets"]["socketEntries"][2];
-echo getPerks($getsecond,$great,$good);
+$getsecond = $invItemDef[$itemdef]["sockets"]["socketEntries"][2];
+echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
@@ -282,8 +329,8 @@ foreach($item["pve"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getthird = $itemdef["Response"]["sockets"]["socketEntries"][3];
-echo getPerks($getthird,$great,$good);
+$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][3];
+echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
       <td>
@@ -300,19 +347,20 @@ foreach($item["pve"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getthird = $itemdef["Response"]["sockets"]["socketEntries"][4];
-echo getPerks($getthird,$great,$good);
+$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][4];
+echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 	  ?>
 	  </td>
     </tr>
   </tbody>
 </table>
 <?php
-
+echo "<p><small>* = Best perks</small></p>";
     }
 }
 
 }
+
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<center><small>By <a href=\"https://www.reddit.com/user/darkelement1987\">/u/darkelement1987</a></small>";
 echo " / <img src=\"https://icons.iconarchive.com/icons/martz90/circle-addon2/16/playstation-icon.png\"><small><b> DrGodroll</b></small></center>";
