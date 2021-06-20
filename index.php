@@ -189,17 +189,30 @@ echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">"
 
 // Weapon Info
 echo "<h4><u>Info</u></h4>";
-echo "<small>Type: </small>";
-echo "<span class=\"badge badge-primary\"><img src=" . $bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"] . " height=18> $element $weptype</span>";
-echo "<br>";
-echo "<small>Archetype: $intrname</small><br>";
-echo "<small>Rarity: $rarity</small><br>";
-echo "<small>System: $controls</small><br>";
-echo "<small>Sheet/season: <a href=\"" . $spreadsheet . sheetUrl(ucwords($sheet)) . "\">" . ucwords($sheet) . "</a></small><br>";
-echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
-echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 ?>
-
+<small>
+<div class="row">
+  <div class="col-sm-auto">
+  Type:<br>
+  Archetype:<br>
+  Rarity:<br>
+  System:<br>
+  Sheet:<br>
+  Source:<br>
+  </div>
+  <div class="col-sm-auto"><span class="badge badge-primary"><img src="<?=$bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"]?>" height="18">
+  <?=$element?> <?=$weptype?></span><br>
+  <?=$intrname?><br>
+  <?=$rarity?><br>
+  <?=$controls?><br>
+  <a href="<?=$spreadsheet?><?=sheetUrl(ucwords($sheet))?>"><?=ucwords($sheet)?></a><br>
+  <?=str_replace('Source: ', '', $colDef[$colhash]["sourceString"])?>
+  </div>
+  <div class="col-sm-auto"></div>
+  <div class="col-sm-auto"></div>
+</div>
+</small>
+<hr style="height:2px;border-width:0;color:gray;background-color:gray">
 <!-- Weapon Stats -->
 <p><h4><u>Stats:</u></h4></p>
 <small>
