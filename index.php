@@ -183,8 +183,10 @@ $mwpve = "<p><h5>Masterwork: <small><b>" . ucwords($value) . "</b></small></h5><
 
 // Weapon name, thumbnail and flavortext
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
+echo "<div class=\"container\">";
 echo "<h4><u>" . ucwords($item["name"]) . "</u></h4>";
 echo "<p><img src=\"" . $icon . "\"></p><i><footer class=\"blockquote-footer\">$flavor</footer></i>";
+echo "</div>";
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 
 // Weapon Info
