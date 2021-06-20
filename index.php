@@ -194,7 +194,6 @@ echo "<small>Sheet/season: <a href=\"" . $spreadsheet . sheetUrl(ucwords($sheet)
 echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
 ?>
 <p><h4><u>Stats:</u></h4></p>
-<p>
 <small>
 <?php
 foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
@@ -208,7 +207,6 @@ foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
 }
 ?>
 </small>
-</p>
 <?php
 
 // PVP ROLL
