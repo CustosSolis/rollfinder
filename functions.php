@@ -112,7 +112,8 @@ return json_decode(curl_exec($ch),true);
 curl_close;
 }
 
-function getPerks($args,$great,$good,$plugDef){
+function getPerks($args,$great,$good){
+	global $plugDef;
 	if (!array_key_exists('randomizedPlugSetHash', $args) && !array_key_exists('reusablePlugSetHash', $args)) {} else {
 	
 	if(isset($args["randomizedPlugSetHash"])){
@@ -143,7 +144,7 @@ function getPerks($args,$great,$good,$plugDef){
 }
 
 function getPerkIcon($name){
-	$invItemDef = json_decode(file_get_contents("invitemdef.json"),true);
+	global $invItemDef;
 	foreach($invItemDef as $key => $value){
 	if($value["displayProperties"]["name"] == $name){
 		$hash = $key;
