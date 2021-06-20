@@ -181,11 +181,13 @@ foreach($item["pve"]["masterwork"] as $key => $value) {
 $mwpve = "<p><h5>Masterwork: <small><b>" . ucwords($value) . "</b></small></h5></p>";
 }
 
-// Echo the weapons info
+// Weapon name, thumbnail and flavortext
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<h4><u>" . ucwords($item["name"]) . "</u></h4>";
 echo "<p><img src=\"" . $icon . "\"></p><i><footer class=\"blockquote-footer\">$flavor</footer></i>";
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
+
+// Weapon Info
 echo "<h4><u>Info</u></h4>";
 echo "<small>Type: </small>";
 echo "<span class=\"badge badge-primary\"><img src=" . $bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"] . " height=18> $element $weptype</span>";
@@ -195,7 +197,10 @@ echo "<small>Rarity: $rarity</small><br>";
 echo "<small>System: $controls</small><br>";
 echo "<small>Sheet/season: <a href=\"" . $spreadsheet . sheetUrl(ucwords($sheet)) . "\">" . ucwords($sheet) . "</a></small><br>";
 echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
+echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 ?>
+
+<!-- Weapon Stats -->
 <p><h4><u>Stats:</u></h4></p>
 <small>
 <?php
@@ -225,7 +230,9 @@ foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
   </div>
 </div>
 </small>
+
 <?php
+echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 
 // PVP ROLL
 echo "<p><h4><u>Good Perks PvP:</u></h4></p>";
@@ -351,6 +358,7 @@ echo "<p><small>* = Best perks / <b>Bold</b> = Good perks</small></p>";
 
 }
 
+// Footer text & links
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<center><small>By <a href=\"https://www.reddit.com/user/darkelement1987\">/u/darkelement1987</a></small>";
 echo " / <img src=\"https://icons.iconarchive.com/icons/martz90/circle-addon2/16/playstation-icon.png\"><small><b> DrGodroll</b> / <img src=\"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\" height=\"24\"> <a href=\"https://github.com/darkelement1987/rollfinder\">Github</a><br>Rolls by /u/Pandapaxxy & /u/Rykerboy</small></center>";
