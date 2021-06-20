@@ -137,7 +137,7 @@ function getPerks($args,$great,$good,$plugDef,$invItemDef){
 					} elseif(in_array(strtolower($value), array_map('strtolower', $good))) {
 						echo "<b>" . $value . "</b><br>";
 					} else {
-						echo "<span style=\"opacity: 0.8;\">" . $value . "</span><br>";
+						echo "<span style=\"opacity: 0.7;\">" . $value . "</span><br>";
 					}
 								}
 					}
