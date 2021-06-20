@@ -191,8 +191,9 @@ echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">"
 echo "<h4><u>Info</u></h4>";
 ?>
 <small>
+<div class="container">
 <div class="row">
-  <div class="col-sm-auto">
+  <div class="col-auto">
   Type:<br>
   Archetype:<br>
   Rarity:<br>
@@ -200,7 +201,7 @@ echo "<h4><u>Info</u></h4>";
   Sheet:<br>
   Source:<br>
   </div>
-  <div class="col-sm-auto"><span class="badge badge-primary"><img src="<?=$bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"]?>" height="18">
+  <div class="col"><span class="badge badge-primary"><img src="<?=$bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"]?>" height="18">
   <?=$element?> <?=$weptype?></span><br>
   <?=$intrname?><br>
   <?=$rarity?><br>
@@ -208,8 +209,7 @@ echo "<h4><u>Info</u></h4>";
   <a href="<?=$spreadsheet?><?=sheetUrl(ucwords($sheet))?>"><?=ucwords($sheet)?></a><br>
   <?=str_replace('Source: ', '', $colDef[$colhash]["sourceString"])?>
   </div>
-  <div class="col-sm-auto"></div>
-  <div class="col-sm-auto"></div>
+</div>
 </div>
 </small>
 <hr style="height:2px;border-width:0;color:gray;background-color:gray">
@@ -230,17 +230,19 @@ foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
 	}
 }
 ?>
+<div class="container">
 <div class="row">
-  <div class="col-sm-auto">
+  <div class="col-auto">
   <?php
   foreach($statnames as $names){echo $names . '<br>';}
   ?>
   </div>
-  <div class="col-sm-auto">
+  <div class="col">
   <?php
   foreach($statvalues as $values){echo $values . '<br>';}
   ?>
   </div>
+</div>
 </div>
 </small>
 
