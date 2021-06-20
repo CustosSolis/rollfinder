@@ -112,7 +112,7 @@ return json_decode(curl_exec($ch),true);
 curl_close;
 }
 
-function getPerks($args,$great,$good,$plugDef,$invItemDef){
+function getPerks($args,$great,$good,$plugDef){
 	if (!array_key_exists('randomizedPlugSetHash', $args) && !array_key_exists('reusablePlugSetHash', $args)) {} else {
 	
 	if(isset($args["randomizedPlugSetHash"])){
@@ -126,9 +126,8 @@ function getPerks($args,$great,$good,$plugDef,$invItemDef){
 		$icons = array();
 		
 		foreach($get as $key => $value){
-			//if($value["currentlyCanRoll"] == true){
-			$perks[] = $invItemDef[$value["plugItemHash"]]["displayProperties"]["name"];
-			//}
+			$file = json_decode(file_get_contents("json/itemdef/" . $value["plugItemHash"] . ".json"),true);
+			$perks[] = $file["displayProperties"]["name"];
 			$perkflip = array_keys(array_flip($perks));
 		}
 				foreach($perkflip as $value){

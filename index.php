@@ -75,7 +75,6 @@ $plugDef = json_decode(file_get_contents("plugdef.json"),true);
 $dmgDef = json_decode(file_get_contents("dmgdef.json"),true);
 $statDef = json_decode(file_get_contents("statdef.json"),true);
 
-
 // Rolls Json
 $rolljson = file_get_contents($rollsurl);
 $rolls = json_decode($rolljson,true);
@@ -132,18 +131,22 @@ foreach($invItemDef as $key => $value){
 	// edit: solved with isset($value["defaultDamageTypeHash"]), there were 2 Heretic entries in invitemdef.json apparently
 	// 1 with defaultDamageTypeHash and 1 without
 	if(strcasecmp($value["displayProperties"]["name"], $name) == 0 && isset($value["collectibleHash"]) && isset($value["defaultDamageTypeHash"])){
-$colhash = $invItemDef[$key]["collectibleHash"];
-$icon = $bungie . $colDef[$colhash]["displayProperties"]["icon"];
-$rarity = $invItemDef[$key]["inventory"]["tierTypeName"];
-$flavor = $invItemDef[$key]["flavorText"];
-$itemdef = $key;
-$weptype = $invItemDef[$key]["itemTypeDisplayName"];
-$getelem = $invItemDef[$key]["defaultDamageType"];
-$getelemhash = $invItemDef[$key]["defaultDamageTypeHash"];
-$intrhash = $invItemDef[$itemdef]["sockets"]["socketEntries"][0]["singleInitialItemHash"];
-$intrname = $invItemDef[$intrhash]["displayProperties"]["name"];
-	}
-}
+		$itemdef = $key;
+		}
+		}
+
+// Read json/itemdef/ files
+$read = json_decode(file_get_contents("json/itemdef/" . $itemdef . ".json"),true);
+$colhash = $read["collectibleHash"];
+$icon = $bungie . $read["displayProperties"]["icon"];
+$rarity = $read["inventory"]["tierTypeName"];
+$flavor = $read["flavorText"];
+$weptype = $read["itemTypeDisplayName"];
+$getelem = $read["defaultDamageType"];
+$getelemhash = $read["defaultDamageTypeHash"];
+$intrhash = $read["sockets"]["socketEntries"][0]["singleInitialItemHash"];
+$intrfile = json_decode(file_get_contents("json/itemdef/" . $intrhash . ".json"),true);
+$intrname = $intrfile["displayProperties"]["name"];
 
 // Specify element/damage names for weapons
 $element = "";
@@ -203,7 +206,7 @@ echo "<h4><u>Info</u></h4>";
   Sheet:<br>
   Source:<br>
   </div>
-  <div class="col"><span class="badge badge-primary"><img src="<?=$bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"]?>" height="18">
+  <div class="col"><span class="badge badge-primary"><img src="<?=$bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"]?>" height="16">
   <?=$element?> <?=$weptype?></span><br>
   <?=$intrname?><br>
   <?=$rarity?><br>
@@ -221,12 +224,12 @@ echo "<h4><u>Info</u></h4>";
 <?php
 $statnames = array();
 $statvalues = array();
-foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
-	foreach($invItemDef[$itemdef]["stats"]["stats"][$key] as $key => $value){
+foreach($read["stats"]["stats"] as $key => $value){
+	foreach($read["stats"]["stats"][$key] as $key => $value){
 		if($key == "statHash"){
 			if(!empty($statDef[$value]["displayProperties"]["name"] && $statDef[$value]["displayProperties"]["name"] !== "Power" && $statDef[$value]["displayProperties"]["name"] !== "Attack")){
 			$statnames[] = $statDef[$value]["displayProperties"]["name"];
-			$statvalues[] = $invItemDef[$itemdef]["stats"]["stats"][$value]["value"];
+			$statvalues[] = $read["stats"]["stats"][$value]["value"];
 			}
 		}
 	}
@@ -236,7 +239,7 @@ foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
 <div class="row">
   <div class="col-auto">
   <?php
-  foreach($statnames as $names){echo $names . '<br>';}
+  foreach($statnames as $names){echo "» " . $names . '<br>';}
   ?>
   </div>
   <div class="col">
@@ -281,29 +284,29 @@ foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getfirst = $invItemDef[$itemdef]["sockets"]["socketEntries"][1];
-echo getPerks($getfirst,$great,$good,$plugDef,$invItemDef);
+$getfirst = $read["sockets"]["socketEntries"][1];
+echo getPerks($getfirst,$great,$good,$plugDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getsecond = $invItemDef[$itemdef]["sockets"]["socketEntries"][2];
-echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
+$getsecond = $read["sockets"]["socketEntries"][2];
+echo getPerks($getsecond,$great,$good,$plugDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][3];
-echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
+$getthird = $read["sockets"]["socketEntries"][3];
+echo getPerks($getthird,$great,$good,$plugDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][4];
-echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
+$getthird = $read["sockets"]["socketEntries"][4];
+echo getPerks($getthird,$great,$good,$plugDef);
 	  ?>
 	  </td>
     </tr>
@@ -340,29 +343,29 @@ foreach($item["pve"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getfirst = $invItemDef[$itemdef]["sockets"]["socketEntries"][1];
-echo getPerks($getfirst,$great,$good,$plugDef,$invItemDef);
+$getfirst = $read["sockets"]["socketEntries"][1];
+echo getPerks($getfirst,$great,$good,$plugDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getsecond = $invItemDef[$itemdef]["sockets"]["socketEntries"][2];
-echo getPerks($getsecond,$great,$good,$plugDef,$invItemDef);
+$getsecond = $read["sockets"]["socketEntries"][2];
+echo getPerks($getsecond,$great,$good,$plugDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][3];
-echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
+$getthird = $read["sockets"]["socketEntries"][3];
+echo getPerks($getthird,$great,$good,$plugDef);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $invItemDef[$itemdef]["sockets"]["socketEntries"][4];
-echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
+$getthird = $read["sockets"]["socketEntries"][4];
+echo getPerks($getthird,$great,$good,$plugDef);
 	  ?>
 	  </td>
     </tr>
