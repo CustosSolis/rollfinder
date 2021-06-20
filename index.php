@@ -200,7 +200,7 @@ echo "<h4><u>Info</u></h4>";
 <div class="row">
   <div class="col-auto">
   Type:<br>
-  Archetype:<br>
+  Intrinsic:<br>
   Rarity:<br>
   System:<br>
   Sheet:<br>
