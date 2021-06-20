@@ -31,6 +31,7 @@ $getInvItemDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldC
 $getColDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyCollectibleDefinition"]);
 $getPlugDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyPlugSetDefinition"]);
 $getDmgDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyDamageTypeDefinition"]);
+$getStatDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyStatDefinition"]);
 
 // Creation of files and update procedure
 if(!file_exists('version.txt')){
@@ -45,6 +46,7 @@ if($localversion !== $remoteversion){
 	file_put_contents("coldef.json",$getColDef);
 	file_put_contents("plugdef.json",$getPlugDef);
 	file_put_contents("dmgdef.json",$getDmgDef);
+	file_put_contents("statdef.json",$getStatDef);
 	}
 
 if(!file_exists('invitemdef.json')){
@@ -63,10 +65,15 @@ if(!file_exists('dmgdef.json')){
 		file_put_contents("dmgdef.json",$getDmgDef);
 }
 
+if(!file_exists('statdef.json')){
+		file_put_contents("statdef.json",$getStatDef);
+}
+
 $invItemDef = json_decode(file_get_contents("invitemdef.json"),true);
 $colDef = json_decode(file_get_contents("coldef.json"),true);
 $plugDef = json_decode(file_get_contents("plugdef.json"),true);
 $dmgDef = json_decode(file_get_contents("dmgdef.json"),true);
+$statDef = json_decode(file_get_contents("statdef.json"),true);
 
 
 // Rolls Json
@@ -185,6 +192,24 @@ echo "<small>Rarity: $rarity</small><br>";
 echo "<small>System: $controls</small><br>";
 echo "<small>Sheet/season: <a href=\"" . $spreadsheet . sheetUrl(ucwords($sheet)) . "\">" . ucwords($sheet) . "</a></small><br>";
 echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
+?>
+<p><h4><u>Stats:</u></h4></p>
+<p>
+<small>
+<?php
+foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
+	foreach($invItemDef[$itemdef]["stats"]["stats"][$key] as $key => $value){
+		if($key == "statHash"){
+			if(!empty($statDef[$value]["displayProperties"]["name"] && $statDef[$value]["displayProperties"]["name"] !== "Power" && $statDef[$value]["displayProperties"]["name"] !== "Attack")){
+			echo $statDef[$value]["displayProperties"]["name"] . ": " . $invItemDef[$itemdef]["stats"]["stats"][$value]["value"] . "<br>";
+			}
+		}
+	}
+}
+?>
+</small>
+</p>
+<?php
 
 // PVP ROLL
 echo "<p><h4><u>Good Perks PvP:</u></h4></p>";
@@ -312,7 +337,7 @@ echo "<p><small>* = Best perks</small></p>";
 
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<center><small>By <a href=\"https://www.reddit.com/user/darkelement1987\">/u/darkelement1987</a></small>";
-echo " / <img src=\"https://icons.iconarchive.com/icons/martz90/circle-addon2/16/playstation-icon.png\"><small><b> DrGodroll</b></small></center>";
+echo " / <img src=\"https://icons.iconarchive.com/icons/martz90/circle-addon2/16/playstation-icon.png\"><small><b> DrGodroll</b> / <img src=\"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\" height=\"24\"> <a href=\"https://github.com/darkelement1987/rollfinder\">Github</a><br>Rolls by /u/Pandapaxxy & /u/Rykerboy</small></center>";
 ?>
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
