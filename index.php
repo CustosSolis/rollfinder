@@ -140,6 +140,8 @@ $itemdef = $key;
 $weptype = $invItemDef[$key]["itemTypeDisplayName"];
 $getelem = $invItemDef[$key]["defaultDamageType"];
 $getelemhash = $invItemDef[$key]["defaultDamageTypeHash"];
+$intrhash = $invItemDef[$itemdef]["sockets"]["socketEntries"][0]["singleInitialItemHash"];
+$intrname = $invItemDef[$intrhash]["displayProperties"]["name"];
 	}
 }
 
@@ -188,6 +190,7 @@ echo "<h4><u>Info</u></h4>";
 echo "<small>Type: </small>";
 echo "<span class=\"badge badge-primary\"><img src=" . $bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"] . " height=18> $element $weptype</span>";
 echo "<br>";
+echo "<small>Archetype: $intrname</small><br>";
 echo "<small>Rarity: $rarity</small><br>";
 echo "<small>System: $controls</small><br>";
 echo "<small>Sheet/season: <a href=\"" . $spreadsheet . sheetUrl(ucwords($sheet)) . "\">" . ucwords($sheet) . "</a></small><br>";
@@ -196,16 +199,31 @@ echo "<small>" . $colDef[$colhash]["sourceString"] . "</small><br>";
 <p><h4><u>Stats:</u></h4></p>
 <small>
 <?php
+$statnames = array();
+$statvalues = array();
 foreach($invItemDef[$itemdef]["stats"]["stats"] as $key => $value){
 	foreach($invItemDef[$itemdef]["stats"]["stats"][$key] as $key => $value){
 		if($key == "statHash"){
 			if(!empty($statDef[$value]["displayProperties"]["name"] && $statDef[$value]["displayProperties"]["name"] !== "Power" && $statDef[$value]["displayProperties"]["name"] !== "Attack")){
-			echo $statDef[$value]["displayProperties"]["name"] . ": " . $invItemDef[$itemdef]["stats"]["stats"][$value]["value"] . "<br>";
+			$statnames[] = $statDef[$value]["displayProperties"]["name"];
+			$statvalues[] = $invItemDef[$itemdef]["stats"]["stats"][$value]["value"];
 			}
 		}
 	}
 }
 ?>
+<div class="row">
+  <div class="col-sm-auto">
+  <?php
+  foreach($statnames as $names){echo $names . '<br>';}
+  ?>
+  </div>
+  <div class="col-sm-auto">
+  <?php
+  foreach($statvalues as $values){echo $values . '<br>';}
+  ?>
+  </div>
+</div>
 </small>
 <?php
 
@@ -214,7 +232,7 @@ echo "<p><h4><u>Good Perks PvP:</u></h4></p>";
 echo $mwpvp;
 
 ?>
-<table class="table">
+<table class="table table-sm">
   <thead class="thead-dark">
     <tr>
       <th scope="col">Barrels/Sights</th>
@@ -271,12 +289,12 @@ echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
 <?php
 
 // PVE ROLL
-echo "<p><small>* = Best perks</small></p>";
+echo "<p><small>* = Best perks / <b>Bold</b> = Good perks</small></p>";
 echo "<h4><u>Good Perks PvE:</u></h4>";
 echo $mwpve;
 
 ?>
-<table class="table">
+<table class="table table-sm">
   <thead class="thead-dark">
     <tr>
       <th scope="col">Barrels/Sights</th>
@@ -327,7 +345,7 @@ echo getPerks($getthird,$great,$good,$plugDef,$invItemDef);
   </tbody>
 </table>
 <?php
-echo "<p><small>* = Best perks</small></p>";
+echo "<p><small>* = Best perks / <b>Bold</b> = Good perks</small></p>";
     }
 }
 
