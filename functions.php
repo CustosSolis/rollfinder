@@ -113,7 +113,7 @@ curl_close;
 }
 
 function getPerks($args,$great,$good){
-	global $plugDef;
+	global $warn;
 	if (!array_key_exists('randomizedPlugSetHash', $args) && !array_key_exists('reusablePlugSetHash', $args)) {} else {
 	
 	if(isset($args["randomizedPlugSetHash"])){
@@ -121,15 +121,19 @@ function getPerks($args,$great,$good){
 	} else {
 		$gethash = $args["reusablePlugSetHash"];
 	}
-		$getdef = $plugDef[$gethash];
-		$get = $getdef["reusablePlugItems"];
+		$plugDef = json_decode(file_get_contents("json/plugdef/" . $gethash . ".json"),true);
+		$get = $plugDef["reusablePlugItems"];
 		$perks = array();
 		$icons = array();
 		
 		foreach($get as $key => $value){
 			$file = json_decode(file_get_contents("json/itemdef/" . $value["plugItemHash"] . ".json"),true);
+			if($value["currentlyCanRoll"] == false){
+				$warn = "<div class=\"alert alert-danger\" role=\"alert\">Some perks for this weapon have been (re)moved so duplicates may appear</div>";
+			}
 			$perks[] = $file["displayProperties"]["name"];
 			$perkflip = array_keys(array_flip($perks));
+			
 		}
 				foreach($perkflip as $value){
 					if (in_array(strtolower($value), array_map('strtolower', $great))) {
@@ -141,16 +145,6 @@ function getPerks($args,$great,$good){
 					}
 								}
 					}
-}
-
-function getPerkIcon($name){
-	global $invItemDef;
-	foreach($invItemDef as $key => $value){
-	if($value["displayProperties"]["name"] == $name){
-		$hash = $key;
-	}
-		}
-		return "https://www.bungie.net" . $invItemDef[$hash]["displayProperties"]["icon"];
 }
 
 ?>

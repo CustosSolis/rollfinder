@@ -1,11 +1,9 @@
 <?php
+if(file_exists('names/placeholder.txt') || file_exists('json/itemdef/placeholder.txt') || file_exists('json/coldef/placeholder.txt') || file_exists('json/plugdef/placeholder.txt')){
+echo "Please run install.php first...";	
+} else {
 require_once("functions.php");
 require("config/config.php");
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-ini_set('memory_limit', '-1');
-set_time_limit(0);
-error_reporting(E_ALL);
 ?>
 <html>
 <head>
@@ -32,6 +30,7 @@ $getColDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldCompo
 $getPlugDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyPlugSetDefinition"]);
 $getDmgDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyDamageTypeDefinition"]);
 $getStatDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyStatDefinition"]);
+$warn = "";
 
 // Creation of files and update procedure
 if(!file_exists('version.txt')){
@@ -40,6 +39,7 @@ if(!file_exists('version.txt')){
 
 $localversion = file_get_contents('version.txt');
 
+// If API-version is different from local version update the local files
 if($localversion !== $remoteversion){
 	file_put_contents('version.txt',$remoteversion);
 	file_put_contents("invitemdef.json",$getInvItemDef);
@@ -49,6 +49,7 @@ if($localversion !== $remoteversion){
 	file_put_contents("statdef.json",$getStatDef);
 	}
 
+// Create ff files don't exist at all
 if(!file_exists('invitemdef.json')){
 		file_put_contents("invitemdef.json",$getInvItemDef);
 }
@@ -69,20 +70,15 @@ if(!file_exists('statdef.json')){
 		file_put_contents("statdef.json",$getStatDef);
 }
 
-$invItemDef = json_decode(file_get_contents("invitemdef.json"),true);
-$colDef = json_decode(file_get_contents("coldef.json"),true);
-$plugDef = json_decode(file_get_contents("plugdef.json"),true);
+// Json files to refer to
 $dmgDef = json_decode(file_get_contents("dmgdef.json"),true);
 $statDef = json_decode(file_get_contents("statdef.json"),true);
-
-// Rolls Json
-$rolljson = file_get_contents($rollsurl);
-$rolls = json_decode($rolljson,true);
+$rolls = json_decode(file_get_contents("rolls.json"),true);
 
 ?>
 
 <!-- Dropdown menu -->
-<form action="" method="post">
+<form action="" method="post" id="findroll">
 <p>
 <select class="js-example-basic-single" name="gun" id="gun">
 <option></option>
@@ -95,7 +91,8 @@ foreach ($rolls as $item) {
 ?>
 </select>
 </p>
-<p align="center"><input type="submit" value="Pick"></p>
+<p align="center"><input type="submit" value="Pick" id="pick" onclick="showDiv()"></p>
+<div style="display:none" id="search"><center><img src="images/search.gif" height="150px"></center></div>
 </form>
 
 <?php
@@ -112,45 +109,38 @@ $sheet = strtolower($result_explode[1]);
 } else {
 	$gun = "";
 	$sheet = "";
-	echo "<center><b>Please make a choice</b></center>";
+	echo "<div id=\"choose\"><center><b>Please make a choice</b></center></div>";
 }
 
 foreach ($rolls as $item) {
     if ((strcasecmp($item["name"],$gun) == 0) && (strcasecmp($item["sheet"],$sheet) == 0)) {
+		
 		// Check if selected option is console or PC in source Json for right tagging.
 		if ($item["mnk"] == "true" && $item["controller"] == "true" ) {$controls = "Console & PC";} else {
 					if ($item["mnk"] == "true"){$controls = "PC";}
 					if ($item["controller"] == "true"){$controls = "Console";}
 		}
 		
-// Convert weaponname to itemhash, replace % with empty placeholder, otherwise search breaks, this is the case for 21% delirium
-$name = ucwords($item["name"]);
-
-foreach($invItemDef as $key => $value){
-	// Note: When errors on, bug occured on Heretic, no defaultDamageTypeHash in invitemdef
-	// edit: solved with isset($value["defaultDamageTypeHash"]), there were 2 Heretic entries in invitemdef.json apparently
-	// 1 with defaultDamageTypeHash and 1 without
-	if(strcasecmp($value["displayProperties"]["name"], $name) == 0 && isset($value["collectibleHash"]) && isset($value["defaultDamageTypeHash"])){
-		$itemdef = $key;
-		}
-		}
+// Convert weaponname to itemhash
+$name = strtolower($item["name"]);
+$itemhash = file_get_contents('names/' . preg_replace("/[^a-z0-9]/", "", $name) . '.txt');
 
 // Read json/itemdef/ files
-$read = json_decode(file_get_contents("json/itemdef/" . $itemdef . ".json"),true);
-$colhash = $read["collectibleHash"];
-$icon = $bungie . $read["displayProperties"]["icon"];
-$rarity = $read["inventory"]["tierTypeName"];
-$flavor = $read["flavorText"];
-$weptype = $read["itemTypeDisplayName"];
-$getelem = $read["defaultDamageType"];
-$getelemhash = $read["defaultDamageTypeHash"];
-$intrhash = $read["sockets"]["socketEntries"][0]["singleInitialItemHash"];
+$itemfile = json_decode(file_get_contents("json/itemdef/" . $itemhash . ".json"),true);
+$colhash = $itemfile["collectibleHash"];
+$colDef = json_decode(file_get_contents("json/coldef/" . $colhash . ".json"),true);
+$icon = $bungie . $itemfile["displayProperties"]["icon"];
+$rarity = $itemfile["inventory"]["tierTypeName"];
+$flavor = $itemfile["flavorText"];
+$weptype = $itemfile["itemTypeDisplayName"];
+$getelem = $itemfile["defaultDamageType"];
+$getelemhash = $itemfile["defaultDamageTypeHash"];
+$intrhash = $itemfile["sockets"]["socketEntries"][0]["singleInitialItemHash"];
 $intrfile = json_decode(file_get_contents("json/itemdef/" . $intrhash . ".json"),true);
 $intrname = $intrfile["displayProperties"]["name"];
-
-// Specify element/damage names for weapons
 $element = "";
 
+// Specify element/damage names for weapons
 switch ($getelem) {
     case 0:
 	$element = "Kinetic";
@@ -195,6 +185,7 @@ echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">"
 // Weapon Info
 echo "<h4><u>Info</u></h4>";
 ?>
+
 <small>
 <div class="container">
 <div class="row">
@@ -212,29 +203,32 @@ echo "<h4><u>Info</u></h4>";
   <?=$rarity?><br>
   <?=$controls?><br>
   <a href="<?=$spreadsheet?><?=sheetUrl(ucwords($sheet))?>"><?=ucwords($sheet)?></a><br>
-  <?=str_replace('Source: ', '', $colDef[$colhash]["sourceString"])?>
+  <?=str_replace('Source: ', '', $colDef["sourceString"])?>
   </div>
 </div>
 </div>
 </small>
 <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+
 <!-- Weapon Stats -->
 <p><h4><u>Stats:</u></h4></p>
 <small>
+
 <?php
 $statnames = array();
 $statvalues = array();
-foreach($read["stats"]["stats"] as $key => $value){
-	foreach($read["stats"]["stats"][$key] as $key => $value){
+foreach($itemfile["stats"]["stats"] as $key => $value){
+	foreach($itemfile["stats"]["stats"][$key] as $key => $value){
 		if($key == "statHash"){
 			if(!empty($statDef[$value]["displayProperties"]["name"] && $statDef[$value]["displayProperties"]["name"] !== "Power" && $statDef[$value]["displayProperties"]["name"] !== "Attack")){
 			$statnames[] = $statDef[$value]["displayProperties"]["name"];
-			$statvalues[] = $read["stats"]["stats"][$value]["value"];
+			$statvalues[] = $itemfile["stats"]["stats"][$value]["value"];
 			}
 		}
 	}
 }
 ?>
+
 <div class="container">
 <div class="row">
   <div class="col-auto">
@@ -252,13 +246,14 @@ foreach($read["stats"]["stats"] as $key => $value){
 </small>
 
 <?php
-echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 
 // PVP ROLL
+echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<p><h4><u>Good Perks PvP:</u></h4></p>";
 echo $mwpvp;
 
 ?>
+
 <table class="table table-sm">
   <thead class="thead-dark">
     <tr>
@@ -271,6 +266,7 @@ echo $mwpvp;
   <tbody>
     <tr>
       <td>
+	  
 	  <?php 
 
 $great = array();
@@ -284,29 +280,29 @@ foreach($item["pvp"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getfirst = $read["sockets"]["socketEntries"][1];
-echo getPerks($getfirst,$great,$good,$plugDef);
+$getfirst = $itemfile["sockets"]["socketEntries"][1];
+getPerks($getfirst,$great,$good);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getsecond = $read["sockets"]["socketEntries"][2];
-echo getPerks($getsecond,$great,$good,$plugDef);
+$getsecond = $itemfile["sockets"]["socketEntries"][2];
+getPerks($getsecond,$great,$good);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $read["sockets"]["socketEntries"][3];
-echo getPerks($getthird,$great,$good,$plugDef);
+$getthird = $itemfile["sockets"]["socketEntries"][3];
+getPerks($getthird,$great,$good);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $read["sockets"]["socketEntries"][4];
-echo getPerks($getthird,$great,$good,$plugDef);
+$getfourth = $itemfile["sockets"]["socketEntries"][4];
+getPerks($getfourth,$great,$good);
 	  ?>
 	  </td>
     </tr>
@@ -316,11 +312,14 @@ echo getPerks($getthird,$great,$good,$plugDef);
 <?php
 
 // PVE ROLL
+echo $warn;
+echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<p><small>* = Best perks / <b>Bold</b> = Good perks</small></p>";
 echo "<h4><u>Good Perks PvE:</u></h4>";
 echo $mwpve;
 
 ?>
+
 <table class="table table-sm">
   <thead class="thead-dark">
     <tr>
@@ -333,6 +332,7 @@ echo $mwpve;
   <tbody>
     <tr>
       <td>
+	  
 	  <?php 
 
 foreach($item["pve"]["greatPerks"] as $key => $value) {
@@ -343,35 +343,38 @@ foreach($item["pve"]["goodPerks"] as $key => $value) {
 $good[] = $value;
 }
 
-$getfirst = $read["sockets"]["socketEntries"][1];
-echo getPerks($getfirst,$great,$good,$plugDef);
+$getfirst = $itemfile["sockets"]["socketEntries"][1];
+getPerks($getfirst,$great,$good);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getsecond = $read["sockets"]["socketEntries"][2];
-echo getPerks($getsecond,$great,$good,$plugDef);
+$getsecond = $itemfile["sockets"]["socketEntries"][2];
+getPerks($getsecond,$great,$good);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $read["sockets"]["socketEntries"][3];
-echo getPerks($getthird,$great,$good,$plugDef);
+$getthird = $itemfile["sockets"]["socketEntries"][3];
+getPerks($getthird,$great,$good);
 	  ?>
 	  </td>
       <td>
 	  <?php 
 
-$getthird = $read["sockets"]["socketEntries"][4];
-echo getPerks($getthird,$great,$good,$plugDef);
+$getfourth = $itemfile["sockets"]["socketEntries"][4];
+getPerks($getfourth,$great,$good);
 	  ?>
 	  </td>
     </tr>
   </tbody>
 </table>
+
 <?php
+echo $warn;
+echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<p><small>* = Best perks / <b>Bold</b> = Good perks</small></p>";
     }
 }
@@ -383,6 +386,7 @@ echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">"
 echo "<center><small>By <a href=\"https://www.reddit.com/user/darkelement1987\">/u/darkelement1987</a></small>";
 echo " / <img src=\"https://icons.iconarchive.com/icons/martz90/circle-addon2/16/playstation-icon.png\"><small><b> DrGodroll</b> / <img src=\"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\" height=\"24\"> <a href=\"https://github.com/darkelement1987/rollfinder\">Github</a><br>Rolls by /u/Pandapaxxy & /u/Rykerboy</small></center>";
 ?>
+
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -390,6 +394,30 @@ echo " / <img src=\"https://icons.iconarchive.com/icons/martz90/circle-addon2/16
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Show/hide messages/animations on search -->
+<script>
+function showDiv() {
+   document.getElementById('search').style.display = "block";
+   document.getElementById('choose').style.display = "none";
+}
+</script>
+
+<!-- Disable pick button on submit to prevent issues -->
+<script>
+    $(document).ready(function () {
+
+        $("#findroll").submit(function (e) {
+
+            //disable the submit button
+            $("#pick").attr("disabled", true);
+
+            return true;
+
+        });
+    });
+</script>
+
 <!-- Sort dropdown alphabetically -->
 <script>
 $(document).ready(function() {
@@ -408,3 +436,4 @@ $('#gun option:eq(0)').prop('selected',true);
 	});
 </script>
 </body></html>
+<?php }?>
