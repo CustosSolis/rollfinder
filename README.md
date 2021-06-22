@@ -12,9 +12,10 @@ Find Godrolls for every weapon in D2Checklists DB.
 PHP 8.0
 
 # Install
-Copy files, run install.php to generate json files. Done.
-
-# Todo
-Autorun install.php whenever api updates
+- Set API key in config.php
+- Copy files
+- Run install.php to generate json files
+- File will be deleted for safety after first run
+- Whenever API gets updated: Copy/run install.php again
 
 http://www.rollfinder.net
