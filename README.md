@@ -14,7 +14,8 @@ PHP 8.0
 # Install
 - Set API key in config.php
 - Copy files
-- Run install.php to generate json files and name files
+- Run install_random.php first (IMPORTANT!)
+- Run install_static.php after that
 - File will be deleted for safety after first run
 - Whenever API gets updated: Copy/run install.php again
 
