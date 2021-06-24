@@ -113,7 +113,8 @@ curl_close;
 }
 
 function getPerks($args,$great,$good){
-	global $warn;
+	global $oldperks;
+	global $currentperks;
 	if (!array_key_exists('randomizedPlugSetHash', $args) && !array_key_exists('reusablePlugSetHash', $args)) {} else {
 	
 	if(isset($args["randomizedPlugSetHash"])){
@@ -124,27 +125,42 @@ function getPerks($args,$great,$good){
 		$plugDef = json_decode(file_get_contents("json/plugdef/" . $gethash . ".json"),true);
 		$get = $plugDef["reusablePlugItems"];
 		$perks = array();
-		$icons = array();
+		$suf = "";
 		
 		foreach($get as $key => $value){
-			$file = json_decode(file_get_contents("json/itemdef/" . $value["plugItemHash"] . ".json"),true);
+			$plugset = json_decode(file_get_contents("json/itemdef/" . $value["plugItemHash"] . ".json"),true);
+			
+			// Set '$oldperks'
 			if($value["currentlyCanRoll"] == false){
-				$warn = "<div class=\"alert alert-danger\" role=\"alert\">Some perks for this weapon have been (re)moved so duplicates may appear</div>";
+				$oldperks[] = $plugset["displayProperties"]["name"];
 			}
-			$perks[] = $file["displayProperties"]["name"];
+			
+			// Set '$currentperks'
+			if($value["currentlyCanRoll"] == true){
+				$currentperks[] = $plugset["displayProperties"]["name"];
+			}
+			
+			// Set all perks and filter out dupes
+			$perks[] = $plugset["displayProperties"]["name"];
 			$perkflip = array_keys(array_flip($perks));
 			
 		}
 				foreach($perkflip as $value){
 					if (in_array(strtolower($value), array_map('strtolower', $great))) {
-						echo "<b><u>" . $value . "</u>*</b><br>";
+						echo "<span><b><u>" . $value . "</u>*</b></span><br>";
 					} elseif(in_array(strtolower($value), array_map('strtolower', $good))) {
-						echo "<b>" . $value . "</b><br>";
+						echo "<span><b>" . $value . "</b></span><br>";
 					} else {
 						echo "<span style=\"opacity: 0.7;\">" . $value . "</span><br>";
 					}
 								}
+
 					}
+}
+
+function getSeason($args){
+	$json = file_get_contents("json/season/$args.json");
+	echo $json;
 }
 
 ?>

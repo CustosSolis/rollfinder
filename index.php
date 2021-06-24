@@ -30,7 +30,9 @@ $getColDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldCompo
 $getPlugDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyPlugSetDefinition"]);
 $getDmgDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyDamageTypeDefinition"]);
 $getStatDef = file_get_contents($bungie . $d2manifest["Response"]["jsonWorldComponentContentPaths"]["en"]["DestinyStatDefinition"]);
-$warn = "";
+$oldperks = array();
+$currentperks = array();
+$retired = array();
 
 // Creation of files and update procedure
 if(!file_exists('version.txt')){
@@ -127,8 +129,13 @@ $itemhash = file_get_contents('names/' . preg_replace("/[^a-z0-9]/", "", $name) 
 
 // Read json/itemdef/ files
 $itemfile = json_decode(file_get_contents("json/itemdef/" . $itemhash . ".json"),true);
+if(isset($itemfile["collectibleHash"])){
 $colhash = $itemfile["collectibleHash"];
 $colDef = json_decode(file_get_contents("json/coldef/" . $colhash . ".json"),true);
+$colSource = $colDef["sourceString"];
+} else {
+	$colSource = "Unknown";
+}
 $icon = $bungie . $itemfile["displayProperties"]["icon"];
 $rarity = $itemfile["inventory"]["tierTypeName"];
 $flavor = $itemfile["flavorText"];
@@ -139,6 +146,8 @@ $intrhash = $itemfile["sockets"]["socketEntries"][0]["singleInitialItemHash"];
 $intrfile = json_decode(file_get_contents("json/itemdef/" . $intrhash . ".json"),true);
 $intrname = $intrfile["displayProperties"]["name"];
 $element = "";
+$getammo = $itemfile["equippingBlock"]["ammoType"];
+$ammo;
 
 // Specify element/damage names for weapons
 switch ($getelem) {
@@ -159,6 +168,25 @@ switch ($getelem) {
 	break;
     case 6:
 	$element = "Stasis";
+	break;
+}
+
+// Specify ammo types
+switch ($getammo) {
+    case 0:
+	$ammo = "None";
+	break;
+    case 1:
+	$ammo = "Primary";
+	break;
+    case 2:
+	$ammo = "Special";
+	break;
+    case 3:
+	$ammo = "Heavy";
+	break;
+    case 4:
+	$ammo = "Unknown";
 	break;
 }
 
@@ -191,7 +219,9 @@ echo "<h4><u>Info</u></h4>";
 <div class="row">
   <div class="col-auto">
   Type:<br>
+  Ammo:<br>
   Intrinsic:<br>
+  Season:<br>
   Rarity:<br>
   System:<br>
   Sheet:<br>
@@ -199,11 +229,13 @@ echo "<h4><u>Info</u></h4>";
   </div>
   <div class="col"><span class="badge badge-primary"><img src="<?=$bungie . $dmgDef[$getelemhash]["displayProperties"]["icon"]?>" height="16">
   <?=$element?> <?=$weptype?></span><br>
+  <?=$ammo?> ammo<br>
   <?=$intrname?><br>
+  <?php getSeason($itemhash);?><br>
   <?=$rarity?><br>
   <?=$controls?><br>
   <a href="<?=$spreadsheet?><?=sheetUrl(ucwords($sheet))?>"><?=ucwords($sheet)?></a><br>
-  <?=str_replace('Source: ', '', $colDef["sourceString"])?>
+  <?=str_replace('Source: ', '', $colSource)?>
   </div>
 </div>
 </div>
@@ -254,6 +286,7 @@ echo $mwpvp;
 
 ?>
 
+<small>
 <table class="table table-sm">
   <thead class="thead-dark">
     <tr>
@@ -308,11 +341,11 @@ getPerks($getfourth,$great,$good);
     </tr>
   </tbody>
 </table>
+</small>
 
 <?php
 
 // PVE ROLL
-echo $warn;
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<p><small>* = Best perks / <b>Bold</b> = Good perks</small></p>";
 echo "<h4><u>Good Perks PvE:</u></h4>";
@@ -320,6 +353,7 @@ echo $mwpve;
 
 ?>
 
+<small>
 <table class="table table-sm">
   <thead class="thead-dark">
     <tr>
@@ -371,11 +405,22 @@ getPerks($getfourth,$great,$good);
     </tr>
   </tbody>
 </table>
+</small>
 
 <?php
-echo $warn;
+
+// Show perks that are no longer available
+foreach($oldperks as $oldperk){
+	if(!in_array($oldperk,$currentperks)){
+		$retired[] = $oldperk;
+	}
+					}
+
 echo "<hr style=\"height:2px;border-width:0;color:gray;background-color:gray\">";
 echo "<p><small>* = Best perks / <b>Bold</b> = Good perks</small></p>";
+if(!empty($retired)){
+echo "<div class=\"alert alert-danger\" role=\"alert\"><small><b><u>Retired perks found</u>**</b><br>The following perks are no longer available on this weapon:<br><i> " . implode(', ', array_unique($retired)) . "</i><br><br><b>** </b>Duplicates mean the perk is now in another slot</small></div>";
+}
     }
 }
 
